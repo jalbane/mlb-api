@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const port = 80;
 const MongoClient = require('mongodb').MongoClient;
-require('dotenv').config();
+//require('dotenv').config();
 
 app.get('/', (req, res) =>{
      MongoClient.connect(process.env.DB_URL, async (err, result) =>{
