@@ -68,4 +68,4 @@ app.get('/league-leaders/:leagueId', (req, res) => {
      })
 })
 
-app.listen(port);
+app.listen(process.env.PORT || port);
