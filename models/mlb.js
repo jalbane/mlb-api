@@ -9,8 +9,8 @@ const franchiseSchema = new mongoose.Schema({
     summary: {
         wins: Number,
         losses: Number,
-        record: String,
-        streak: String,
+        record: String, //default should be "0-0"
+        streak: String, //default can be empty string or W0 or L0
         gamesBack: Number,
         pct: Number
     }

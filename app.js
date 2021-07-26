@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const port = 80;
 const MongoClient = require('mongodb').MongoClient;
+const cors = require('cors');
 //require('dotenv').config();
+
+app.use(cors())
 
 app.get('/', (req, res) =>{
      MongoClient.connect(process.env.DB_URL, async (err, result) =>{
@@ -14,22 +17,32 @@ app.get('/', (req, res) =>{
 })
 
 function getTeamSummary(req, res, next){
-     var value = req.params.team;
-     value = value.split('-').map( (s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ')
-     MongoClient.connect(process.env.DB_URL, async (err, result) =>{
-          if (err) throw new err;     
-          result.db('MLB').collection('franchises').findOne({team: value}, (err, result) => {
-               if (err) {return res.sendStatus(400)}
-               if (result == null){return res.sendStatus(400)}
-               res.json(result)
+     var value = req.params.team.split('-').map( (s) => s.charAt(0).toUpperCase() + s.substring(1).toLowerCase()).join(' ');
+     if (isNaN(value)){
+          MongoClient.connect(process.env.DB_URL, async (err, result) =>{
+               if (err) throw new err;     
+               result.db('MLB').collection('franchises').findOne({team: value}, (err, result) => {
+                    if (err) {return res.sendStatus(400)}
+                    if (result == null){return res.sendStatus(400)}
+                    return res.json(result)
+               })
           })
-
-          next();
-     })
+     }
+     next();
 }
 
 app.get('/franchise/:team', getTeamSummary, (req, res) => {
-
+     var value = parseInt(req.params.team);
+     if (!isNaN(value)){
+          MongoClient.connect(process.env.DB_URL, async (err, result) =>{
+               if (err) throw new err;     
+               result.db('MLB').collection('franchises').findOne({teamId: value}, (err, result) => {
+                    if (err) {return res.sendStatus(400)}
+                    if (result == null){return res.sendStatus(400)}
+                    return res.json(result)
+               })
+          })
+     }
 })
 
 app.get('/league/:leagueId',  (req, res) => {
@@ -65,6 +78,17 @@ app.get('/league-leaders/:leagueId', (req, res) => {
                res.json(db)
           })
           
+     })
+})
+
+app.get('/league-leaders', (req, res) => {
+     MongoClient.connect(process.env.DB_URL, async (err, result) => {
+          if (err) throw err;
+          result.db('MLB').collection('franchises').find({"summary.gamesBack": parseInt(0)}).sort({"summary.pct": -1}).toArray( (err, db) => {
+               if (err) {return res.sendStatus(400)};
+               if (db.length === 0) {return res.sendStatus(400)}
+               res.json(db)
+          })
      })
 })
 

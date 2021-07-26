@@ -48,7 +48,7 @@ function calcStreak(currentStreak, message){
         tempNumber = 1
     }
 
-    //currently on a losing streak and lost their last game.
+    //evaluate currently on a losing streak and lost their last game.
     else if (tempStreak === "L" && message === "loser"){
         if (tempNumber >= 0){
             tempNumber += 1;
@@ -59,6 +59,22 @@ function calcStreak(currentStreak, message){
     return (tempStreak.concat(tempNumber))
 }
 
+function calcRecord(currentRecord, message){
+    let string = currentRecord;
+    let [string1, string2] = string.split("-")
+    if (message === "winner"){
+        string1 = parseInt(string1);
+        string1 +=1;
+        string1 = string1.toString();
+    }
+    if (message === "loser"){
+        string2 = parseInt(string2);
+        string2 += 1;
+        string2 = string2.toString();
+    }
+    string = [string1, string2].join("-")
+    return string;
+}
 var readFile = fs.createReadStream('./Input/input.csv')
 .pipe(csv())
 .on('data', (data) => {
@@ -75,13 +91,9 @@ var readFile = fs.createReadStream('./Input/input.csv')
         api.updateOne( {team: victor}, {$inc: {"summary.wins": 1} } );
         api.findOne( {team: victor}, (err, result) => {
             if (err) throw err;
-            var string = result.summary.record;
-            let [string1, string2] = string.split("-")
-            string1 = parseInt(string1);
-            string1 +=1
-            string1 = string1.toString()
-            string = [string1, string2].join("-")
-            api.updateOne({team: victor}, {$set: {"summary.record": string}})
+            //calculate winning teams record
+            let newRecord = calcRecord(result.summary.record, "winner");
+            api.updateOne({team: victor}, {$set: {"summary.record": newRecord}})
 
             //calculate the winning teams new win percentage & update it.
             let winPercentage = calcPercentage(result.summary.wins, result.summary.losses)
@@ -97,13 +109,9 @@ var readFile = fs.createReadStream('./Input/input.csv')
         api.updateOne( {team: loser}, {$inc: {"summary.losses": 1} } );
         api.findOne( {team: loser}, (err, result) => {
             if (err) throw err;
-            var string = result.summary.record;
-            let [string1, string2] = string.split("-")
-            string2 = parseInt(string2);
-            string2 +=1
-            string2 = string2.toString()
-            string = [string1, string2].join("-")
-            api.updateOne({team: loser}, {$set: {"summary.record": string}})
+            //calculate losing teams record
+            let newRecord = calcRecord(result.summary.record, "loser");
+            api.updateOne({team: loser}, {$set: {"summary.record": newRecord}})
 
             //calculate the losing teams new win percentage & update it.
             let winPercentage = calcPercentage(result.summary.wins, result.summary.losses)

@@ -18,7 +18,7 @@ function calcStreak(currentStreak, message){
         var tempStreak = currentStreak.charAt(0);
         var tempNumber = parseInt(currentStreak.substring(1));
     } catch(e){
-        if (e instanceof TypeError){
+        if (currentStreak instanceof TypeError){
             if (message === "winner"){
                 return "W1"
             }
@@ -58,6 +58,23 @@ function calcStreak(currentStreak, message){
     return (tempStreak.concat(tempNumber))
 }
 
+function calcRecord(currentRecord, message){
+    let string = currentRecord;
+    let [string1, string2] = string.split("-")
+    if (message === "winner"){
+        string1 = parseInt(string1);
+        string1 +=1;
+        string1 = string1.toString();
+    }
+    if (message === "loser"){
+        string2 = parseInt(string2);
+        string2 += 1;
+        string2 = string2.toString();
+    }
+    string = [string1, string2].join("-")
+    return (console.log(string))
+}
+
 function processLeader(result, api){
     let teamName = result[0].team
     //api.updateOne({team: teamName}, {$set: {"summary.gamesBack": 0}})
@@ -90,6 +107,7 @@ var readFile = fs.createReadStream('./Input/input.csv')
             if (err) throw err;
             try {
                 let data = result.summary
+                calcRecord(data.record, "winner")
             } catch (e){
                 if(e instanceof TypeError){
                     console.log('error finding winner', victor)
@@ -101,6 +119,7 @@ var readFile = fs.createReadStream('./Input/input.csv')
             if (err) throw err;
             try {
                 let data = result.summary
+                calcRecord(data.record, "loser")
                 console.log(victor, 'defeated', loser)
             } catch (e){
                 if(e instanceof TypeError){
