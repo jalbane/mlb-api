@@ -10,7 +10,7 @@ app.use(cors())
 app.get('/', (req, res) =>{
      MongoClient.connect(process.env.DB_URL, async (err, result) =>{
           if (err) throw new err;     
-          result.db('MLB').collection('franchises').find().toArray()
+          result.db('MLB').collection('franchises').find().toArray().sort({teamId: 1})
                .then(result => res.json(result))
                .catch(err => console.log (err))
      })
