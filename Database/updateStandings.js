@@ -9,7 +9,7 @@ function processLeader(result, api){
     i = 1;
     while (i < result.length){
         teamName = result[i].team
-        winDiff = result[0].summary.wins - result[i].summary.wins
+        winDiff = Math.abs(result[0].summary.wins - result[i].summary.wins)
         lossDiff = Math.abs(result[0].summary.losses - result[i].summary.losses)
         gamesBack = parseFloat(((winDiff+lossDiff)/2).toFixed(1))
         api.updateOne({team: teamName}, {$set: {"summary.gamesBack": gamesBack}})
