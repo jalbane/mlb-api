@@ -2,6 +2,7 @@ const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 const fs = require('fs')
 const csv = require('csv-parse')
+const regSeasonGames = require('../models/regSeasonGames.js');
 
 function calcPercentage(wins, losses){
     return (wins/(wins+losses))
@@ -86,6 +87,7 @@ var readFile = fs.createReadStream('./Input/input.csv')
     MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, (err, res)=> {
         if (err) throw err;
         var api = res.db('MLB').collection('franchises')
+        var gameApi = res.db('MLB').collection('regularSeasonGames')
         console.log(victor, 'defeated', loser)
         //winning team updates
         api.updateOne( {team: victor}, {$inc: {"summary.wins": 1} } );
@@ -122,6 +124,25 @@ var readFile = fs.createReadStream('./Input/input.csv')
             let streak = calcStreak(result.summary.streak, "loser")
             api.updateOne({team: loser}, {$set: {"summary.streak": streak}})
         })
+
+        let obj = new regSeasonGames({
+            winner: {
+                name: victor,
+                runs: data[3]
+            },
+            loser: {
+                name: loser,
+                runs: data[4]
+            },
+            stadium: data[1].trimEnd().trimStart(),
+            date: data[2],
+            makeUpGame: parseInt(data[5]),
+            divisionGame: parseInt(data[6]),
+            interleagueGame: parseInt(data[7]),
+            runDiff: data[3] - data[4]
+        })
+        let array = new Array(obj)
+        gameApi.insertMany(array)
         readFile.resume()
     })
 })

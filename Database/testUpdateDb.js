@@ -2,6 +2,7 @@ const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
 const fs = require('fs')
 const csv = require('csv-parse')
+const regSeasonGames = require('../models/regSeasonGames.js');
 
 function calcPercentage(wins, losses){
     return (wins/(wins+losses))
@@ -99,10 +100,16 @@ var readFile = fs.createReadStream('./Input/input.csv')
     var [victor, loser]= data[0].split('vs')
     victor = victor.trimEnd().trimStart()
     loser = loser.trimEnd().trimStart()
+
+    if (data.length !== 9){
+        console.log('csv input is incorrect')
+        process.exit(1)
+    }
     MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, (err, res)=> {
         
         if (err) throw err;
         var api = res.db('MLB').collection('franchises')
+        var gameApi = res.db('MLB').collection('regularSeasonGames')
         api.findOne( {team: victor}, (err, result) => {
             if (err) throw err;
             try {
@@ -127,6 +134,24 @@ var readFile = fs.createReadStream('./Input/input.csv')
                 }
             }
         })   
+
+        let obj = new regSeasonGames({
+            winner: {
+                name: victor,
+                runs: data[3]
+            },
+            loser: {
+                name: loser,
+                runs: data[4]
+            },
+            stadium: data[1].trimEnd().trimStart(),
+            date: data[2],
+            makeUpGame: parseInt(data[5]),
+            divisionGame: parseInt(data[6]),
+            interleagueGame: parseInt(data[7]),
+            runDiff: data[3] - data[4]
+        })
+        console.log('what to insert: ',obj)
         readFile.resume()
     })
     
