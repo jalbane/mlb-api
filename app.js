@@ -56,19 +56,85 @@ app.get('/league/:leagueId/:division', (req, res) => {
      })
 })
 
-app.get('/league-leaders/:leagueId', (req, res) => {
-     dbConnect.collection('franchises').find({league: parseInt(req.params.leagueId), "summary.gamesBack": parseInt(0)}).sort({"summary.pct": -1}).toArray( (err, db) => {
-          if (err) {return res.sendStatus(400)};
-          if (db.length === 0) {return res.sendStatus(400)}
-          res.json(db)
+function checkLeagueQuery(req, res, next){
+     if (req.query.hasOwnProperty('league')){
+          let league = parseInt(req.query.league)     
+          
+          dbConnect.collection('franchises').find({"summary.gamesBack": parseInt(0), league: league}).sort({"summary.pct": -1}).toArray( (err, db) => {
+               if (err) {return res.sendStatus(400)}
+               if (db.length === 0) {return res.sendStatus(400)}
+               return res.json(db)
+          })  
+     }
+     next();
+}
+
+app.get('/league-leaders', checkLeagueQuery, (req, res) => {
+     if (req.query.league == undefined){
+          dbConnect.collection('franchises').find({"summary.gamesBack": parseInt(0)}).sort({"summary.pct": -1}).toArray( (err, db) => {
+               if (err) {return res.sendStatus(400)};
+               if (db.length === 0) {return res.sendStatus(400)}
+               return res.json(db)
+          })
+     }
+})
+
+app.get('/regular-season', (req, res) => {
+     if(req.query.hasOwnProperty('team')){
+          dbConnect.collection('regularSeasonGames').find({$or: [{winner: req.query.team}, {loser: req.query.team}]}, {divisionGame: true} ).toArray( (err, db) => {
+               if (err) {return res.sendStatus(400)}
+               if (db.length === 0) {return res.sendStatus(400)}
+               return res.json(db)
+          })
+     }
+     if(req.query.hasOwnProperty('division')){
+          let value = false
+          if(parseInt(req.query.division) !== 0){
+               value = true
+          }
+          dbConnect.collection('regularSeasonGames').find({divisionGame: value}).toArray( (err, db) => {
+               if (err) {return res.sendStatus(400)}
+               if (db.length === 0) {return res.sendStatus(400)}
+               return res.json(db)
+          })
+     }
+})
+
+app.get('/regular-season/division-matchups', (req, res) => {
+     let formatTeamString = req.query.team.split('-')
+
+     formatTeamString = formatTeamString.map( item => {
+         return item = item.charAt(0).toUpperCase() + item.substring(1)
+     })
+     .join(' ')
+
+     dbConnect.collection('regularSeasonGames').find( {$and: [{divisionGame: true, date: {$gte: new Date(req.query.since)},$or: [{"winner.name": formatTeamString}, {"loser.name": formatTeamString}]}]} ).toArray( (err, db)=>{
+          if (err) {return res.sendStatus(404)}
+          if (db.length === 0){return res.sendStatus(400)}
+          return res.json(db)
      })
 })
 
-app.get('/league-leaders', (req, res) => {
-     dbConnect.collection('franchises').find({"summary.gamesBack": parseInt(0)}).sort({"summary.pct": -1}).toArray( (err, db) => {
-          if (err) {return res.sendStatus(400)};
-          if (db.length === 0) {return res.sendStatus(400)}
-          res.json(db)
+app.get('/regular-season/wins', (req, res) => { 
+     if ( !(req.query.hasOwnProperty('margin')) ){
+          return res.json({"Error": "You're missing one or more required query fields. Check for spelling mistakes"})
+     }
+     let formatTeamString     
+     try {
+          formatTeamString = req.query.team.split('-')
+          formatTeamString = formatTeamString.map( item => {
+               return item = item.charAt(0).toUpperCase() + item.substring(1)
+          })
+          .join(' ')
+     }
+     catch (e){
+          formatTeamString = /[a-z]/
+     }
+
+     dbConnect.collection('regularSeasonGames').find({"winner.name": formatTeamString, runDiff: {$gte: parseInt(req.query.margin)}}).toArray( (err, db) => {
+          if (err) throw err;
+          if (db.length === 0) {return res.json({"error": "No records found matching your preferences"})}
+          return res.json({db})
      })
 })
 
