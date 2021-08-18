@@ -80,24 +80,25 @@ app.get('/league-leaders', checkLeagueQuery, (req, res) => {
 })
 
 app.get('/regular-season', (req, res) => {
-     if(req.query.hasOwnProperty('team')){
-          dbConnect.collection('regularSeasonGames').find({$or: [{winner: req.query.team}, {loser: req.query.team}]}, {divisionGame: true} ).toArray( (err, db) => {
-               if (err) {return res.sendStatus(400)}
-               if (db.length === 0) {return res.sendStatus(400)}
-               return res.json(db)
+     let formatTeamString, divisionGameFlag
+     try {
+          formatTeamString = req.query.team.split('-')
+          formatTeamString = formatTeamString.map( item => {
+               return item = item.charAt(0).toUpperCase() + item.substring(1)
           })
+          .join(' ')
+          divisionGameFlag = req.query.division
      }
-     if(req.query.hasOwnProperty('division')){
-          let value = false
-          if(parseInt(req.query.division) !== 0){
-               value = true
-          }
-          dbConnect.collection('regularSeasonGames').find({divisionGame: value}).toArray( (err, db) => {
-               if (err) {return res.sendStatus(400)}
-               if (db.length === 0) {return res.sendStatus(400)}
-               return res.json(db)
-          })
-     }
+     catch (e){
+          formatTeamString = /[a-z]/
+          divisionGameFlag = false
+     }     
+
+     dbConnect.collection('regularSeasonGames').find({$or: [{"winner.name": formatTeamString}, {"loser.name": formatTeamString}]}, {divisionGame: divisionGameFlag} ).toArray( (err, db) => {
+          if (err) {return res.sendStatus(400)}
+          if (db.length === 0) {return res.sendStatus(400)}
+          return res.json(db.reverse())
+     })
 })
 
 app.get('/regular-season/division-matchups', (req, res) => {
