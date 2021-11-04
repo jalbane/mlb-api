@@ -13,23 +13,25 @@ function calcStreak(currentStreak, message){
     * If a franchise has not yet recorded a single game (ie. opening day of the regular season/start of postseason),
     * this should help avoid any bugs if the database has not been seeded correctly.
     */    
-    {
-        if (currentStreak){ 
-            //check for truthy function parameter before variable assignment
-            var tempStreak = currentStreak.charAt(0);
-            var tempNumber = parseInt(currentStreak.substring(1));
-        }
+    let tempStreak
+    let tempNumber
+
+    if (currentStreak){ 
+        //check for truthy function parameter before variable assignment
+        tempStreak = currentStreak.charAt(0);
+        tempNumber = parseInt(currentStreak.substring(1));
+    }
 
         //check for empty string
-        if (currentStreak === ""){
-            if (message === "winner"){
-                return "W1"
-            }
-            if (message === "loser"){
-                return "L1"
-            }
+    if (currentStreak === ""){
+        if (message === "winner"){
+            return "W1"
+        }
+        if (message === "loser"){
+            return "L1"
         }
     }
+
     //evaluate if currently on a win streak and won their last game.
     if (tempStreak === "W" && message === "winner"){
         if (tempNumber >= 0){
@@ -80,49 +82,49 @@ var readFile = fs.createReadStream('./Input/input.csv')
 .pipe(csv())
 .on('data', (data) => {
     readFile.pause();
-    var [victor, loser]= data[0].split(' vs ')
+    var [victor, loser]= data[0].split('vs')
     victor = victor.trimEnd().trimStart()
     loser = loser.trimEnd().trimStart()
     
     MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, (err, res)=> {
         if (err) throw err;
-        var api = res.db('MLB').collection('franchises')
-        var gameApi = res.db('MLB').collection('regularSeasonGames')
+        var api = res.db('MLB').collection('franchises2022')
+        var gameApi = res.db('MLB').collection('regularSeasonGames2022')
         console.log(victor, 'defeated', loser)
         //winning team updates
-        api.updateOne( {team: victor}, {$inc: {"summary.wins": 1} } );
+        api.updateOne( {team: victor}, {$inc: {"wins": 1} } );
         api.findOne( {team: victor}, (err, result) => {
             if (err) throw err;
             //calculate winning teams record
-            let newRecord = calcRecord(result.summary.record, "winner");
-            api.updateOne({team: victor}, {$set: {"summary.record": newRecord}})
+            let newRecord = calcRecord(result.record, "winner");
+            api.updateOne({team: victor}, {$set: {"record": newRecord}})
 
             //calculate the winning teams new win percentage & update it.
-            let winPercentage = calcPercentage(result.summary.wins, result.summary.losses)
+            let winPercentage = calcPercentage(result.wins, result.losses)
             winPercentage = parseFloat(winPercentage.toFixed(3))
-            api.updateOne({team: victor}, {$set: {"summary.pct": winPercentage}})
+            api.updateOne({team: victor}, {$set: {"pct": winPercentage}})
 
             //calculate winning teams 10-game streak.
-            let streak = calcStreak(result.summary.streak, "winner")
-            api.updateOne({team: victor}, {$set: {"summary.streak": streak}})
+            let streak = calcStreak(result.streak, "winner")
+            api.updateOne({team: victor}, {$set: {"streak": streak}})
         })
 
         //losing team updates
-        api.updateOne( {team: loser}, {$inc: {"summary.losses": 1} } );
+        api.updateOne( {team: loser}, {$inc: {"losses": 1} } );
         api.findOne( {team: loser}, (err, result) => {
             if (err) throw err;
             //calculate losing teams record
-            let newRecord = calcRecord(result.summary.record, "loser");
-            api.updateOne({team: loser}, {$set: {"summary.record": newRecord}})
+            let newRecord = calcRecord(result.record, "loser");
+            api.updateOne({team: loser}, {$set: {"record": newRecord}})
 
             //calculate the losing teams new win percentage & update it.
-            let winPercentage = calcPercentage(result.summary.wins, result.summary.losses)
+            let winPercentage = calcPercentage(result.wins, result.losses)
             winPercentage = parseFloat(winPercentage.toFixed(3))
-            api.updateOne({team: loser}, {$set: {"summary.pct": winPercentage}})
+            api.updateOne({team: loser}, {$set: {"pct": winPercentage}})
 
             //calculate losing teams 10-game streak.
-            let streak = calcStreak(result.summary.streak, "loser")
-            api.updateOne({team: loser}, {$set: {"summary.streak": streak}})
+            let streak = calcStreak(result.streak, "loser")
+            api.updateOne({team: loser}, {$set: {"streak": streak}})
         })
 
         let obj = new regSeasonGames({

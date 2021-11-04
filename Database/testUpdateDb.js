@@ -84,8 +84,8 @@ function processLeader(result, api){
     i = 1;
     while (i < result.length){
         teamName = result[i].team
-        winDiff = result[0].summary.wins - result[i].summary.wins
-        lossDiff = Math.abs(result[0].summary.losses - result[i].summary.losses)
+        winDiff = result[0].wins - result[i].wins
+        lossDiff = Math.abs(result[0].losses - result[i].losses)
         gamesBack = parseFloat(((winDiff+lossDiff)/2).toFixed(1))
         //api.updateOne({team: teamName}, {$set: {"summary.gamesBack": gamesBack}})
         //console.log(teamName, "updated gamesback to", gamesBack)
@@ -108,16 +108,16 @@ var readFile = fs.createReadStream('./Input/input.csv')
     MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, (err, res)=> {
         
         if (err) throw err;
-        var api = res.db('MLB').collection('franchises')
-        var gameApi = res.db('MLB').collection('regularSeasonGames')
+        var api = res.db('MLB').collection('franchises2022')
+        var gameApi = res.db('MLB').collection('regularSeasonGames2022')
         api.findOne( {team: victor}, (err, result) => {
             if (err) throw err;
             try {
-                let data = result.summary
+                let data = result
                 calcRecord(data.record, "winner")
             } catch (e){
                 if(e instanceof TypeError){
-                    console.log('error finding winner', victor)
+                    process.exit(1)
                 }
             }
 
@@ -125,12 +125,12 @@ var readFile = fs.createReadStream('./Input/input.csv')
         api.findOne( {team: loser}, (err, result) => {
             if (err) throw err;
             try {
-                let data = result.summary
+                let data = result
                 calcRecord(data.record, "loser")
                 console.log(victor, 'defeated', loser)
-            } catch (e){
+            } catch (loser){
                 if(e instanceof TypeError){
-                    console.log('error finding loser', loser)
+                    process.exit(1)
                 }
             }
         })   

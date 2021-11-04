@@ -144,3 +144,5 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, (err, result
      dbConnect= result.db()
      app.listen(process.env.PORT || port);
 })
+
+module.exports = app;

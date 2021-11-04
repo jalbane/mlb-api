@@ -41,3 +41,5 @@
     - Examples: 
         - 'https://api-mlb.herokuapp.com/league-leaders/0'
     - Returns info about 3 teams that are in first place in the specified league.
+
+### /regular-season
