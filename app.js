@@ -101,6 +101,27 @@ app.get('/regular-season', (req, res) => {
      })
 })
 
+async function getPageNumbers(req, res, next){
+     if (req.query.hasOwnProperty('number')){
+          let maxPageNumbers = dbConnect.collection('regularSeasonGames')
+          await maxPageNumbers.countDocuments()
+          .then(response => res.locals.pages = Math.floor(response / 20))
+          next();
+     }
+     else 
+          return res.sendStatus(400)
+}
+
+app.get('/regular-season/page', getPageNumbers, (req, res) => {     
+     let pages = res.locals.pages
+     dbConnect.collection('regularSeasonGames').find().skip(req.query.number*20).limit(20).sort({date: -1}).toArray(  (err, result) => {
+          if (err) {return res.sendStatus(400)}
+          if (result.length === 0){return res.sendStatus(400)}
+          return res.json( {result, pages});
+     })
+     
+})
+
 app.get('/regular-season/division-matchups', (req, res) => {
      let formatTeamString = req.query.team.split('-')
 
@@ -139,6 +160,11 @@ app.get('/regular-season/wins', (req, res) => {
      })
 })
 
+
+/**
+ * If you get errors here you need to comment out dotenv.config for production, or
+ * undo the comments for development mode.
+ */
 MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, (err, result) => {
      if (err) throw err; 
      dbConnect= result.db()
