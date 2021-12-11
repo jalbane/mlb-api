@@ -8,9 +8,12 @@ var dbConnect;
 
 app.use(cors())
 app.get('/', (req, res) =>{
-     dbConnect.collection('franchises').find().sort({teamId: 1}).toArray( (err, db) => {
+     console.log(req.query.hasOwnProperty('season'))
+     if (!req.query.hasOwnProperty('season'))
+          return res.sendStatus(400)
+     dbConnect.collection('franchises').find({season: parseInt(req.query.season)}).sort({teamId: 1}).toArray( (err, db) => {
           if (err) {return res.sendStatus(400)};
-          if (db.length === 0) {return res.sendStatus(400)}
+          if (db.length === 0) {return res.status(400).send("Year query parameter is possibly invalid, valid range starts at year 2021.")}
           return res.json(db)
      })  
 })
