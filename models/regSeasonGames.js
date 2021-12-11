@@ -17,7 +17,8 @@ const regSeasonGames = new mongoose.Schema({
     makeUpGame: Boolean,
     divisionGame: Boolean,
     interleagueGame: Boolean,
-    runDiff: Number
+    runDiff: Number,
+    season: Number
 })
 
 module.exports = mongoose.model('regSeasonGames', regSeasonGames);

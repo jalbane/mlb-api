@@ -4,7 +4,7 @@ require('dotenv').config();
 
 MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, res)=> {
     if (err) throw err;
-    var api = res.db('MLB').collection('franchises2022')
+    var api = res.db('MLB').collection('franchises')
     var documentCount;
     await api.countDocuments()
         .then( (res) => documentCount = res)

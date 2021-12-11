@@ -41,7 +41,7 @@ app.get('/franchise/:team', getTeamSummary, (req, res) => {
 })
 
 app.get('/league/:leagueId',  (req, res) => {
-     dbConnect.collection('franchises').find({league: parseInt(req.params.leagueId)}).sort({division: 1, "summary.pct": -1}).toArray( (err, db) => {
+     dbConnect.collection('franchises').find({league: parseInt(req.params.leagueId)}).sort({division: 1, "pct": -1}).toArray( (err, db) => {
           if (err) {return res.sendStatus(400)};
           if (db.length === 0) {return res.sendStatus(400)}
           res.json(db)
@@ -49,7 +49,7 @@ app.get('/league/:leagueId',  (req, res) => {
 })
 
 app.get('/league/:leagueId/:division', (req, res) => {
-     dbConnect.collection('franchises').find({league: parseInt(req.params.leagueId), division: req.params.division}).sort({"summary.pct": -1}).toArray( (err, db) => {
+     dbConnect.collection('franchises').find({league: parseInt(req.params.leagueId), division: req.params.division}).sort({"pct": -1}).toArray( (err, db) => {
           if (err) {return res.sendStatus(400)};
           if (db.length === 0) {return res.sendStatus(400)}
           res.json(db)
@@ -60,7 +60,7 @@ function checkLeagueQuery(req, res, next){
      if (req.query.hasOwnProperty('league')){
           let league = parseInt(req.query.league)     
           
-          dbConnect.collection('franchises').find({"summary.gamesBack": parseInt(0), league: league}).sort({"summary.pct": -1}).toArray( (err, db) => {
+          dbConnect.collection('franchises').find({"gamesBack": parseInt(0), league: league}).sort({"pct": -1}).toArray( (err, db) => {
                if (err) {return res.sendStatus(400)}
                if (db.length === 0) {return res.sendStatus(400)}
                return res.json(db)
@@ -71,7 +71,7 @@ function checkLeagueQuery(req, res, next){
 
 app.get('/league-leaders', checkLeagueQuery, (req, res) => {
      if (req.query.league == undefined){
-          dbConnect.collection('franchises').find({"summary.gamesBack": parseInt(0)}).sort({"summary.pct": -1}).toArray( (err, db) => {
+          dbConnect.collection('franchises').find({"gamesBack": parseInt(0)}).sort({"pct": -1}).toArray( (err, db) => {
                if (err) {return res.sendStatus(400)};
                if (db.length === 0) {return res.sendStatus(400)}
                return res.json(db)
