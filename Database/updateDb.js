@@ -88,43 +88,43 @@ var readFile = fs.createReadStream('./Input/input.csv')
     
     MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, (err, res)=> {
         if (err) throw err;
-        var api = res.db('MLB').collection('franchises2022')
-        var gameApi = res.db('MLB').collection('regularSeasonGames2022')
+        var api = res.db('MLB').collection('franchises')
+        var gameApi = res.db('MLB').collection('regularSeasonGames')
         console.log(victor, 'defeated', loser)
         //winning team updates
-        api.updateOne( {team: victor}, {$inc: {"wins": 1} } );
-        api.findOne( {team: victor}, (err, result) => {
+        api.updateOne( {season: Number(data[2].split('-')[2]), team: victor}, {$inc: {"wins": 1} } );
+        api.findOne( {season: Number(data[2].split('-')[2]), team: victor}, (err, result) => {
             if (err) throw err;
             //calculate winning teams record
             let newRecord = calcRecord(result.record, "winner");
-            api.updateOne({team: victor}, {$set: {"record": newRecord}})
+            api.updateOne({season: Number(data[2].split('-')[2]), team: victor}, {$set: {"record": newRecord}})
 
             //calculate the winning teams new win percentage & update it.
             let winPercentage = calcPercentage(result.wins, result.losses)
             winPercentage = parseFloat(winPercentage.toFixed(3))
-            api.updateOne({team: victor}, {$set: {"pct": winPercentage}})
+            api.updateOne({season: Number(data[2].split('-')[2]), team: victor}, {$set: {"pct": winPercentage}})
 
             //calculate winning teams 10-game streak.
             let streak = calcStreak(result.streak, "winner")
-            api.updateOne({team: victor}, {$set: {"streak": streak}})
+            api.updateOne({season: Number(data[2].split('-')[2]), team: victor}, {$set: {"streak": streak}})
         })
 
         //losing team updates
-        api.updateOne( {team: loser}, {$inc: {"losses": 1} } );
-        api.findOne( {team: loser}, (err, result) => {
+        api.updateOne( {season: Number(data[2].split('-')[2]), team: loser}, {$inc: {"losses": 1} } );
+        api.findOne( {season: Number(data[2].split('-')[2]), team: loser}, (err, result) => {
             if (err) throw err;
             //calculate losing teams record
             let newRecord = calcRecord(result.record, "loser");
-            api.updateOne({team: loser}, {$set: {"record": newRecord}})
+            api.updateOne({season: Number(data[2].split('-')[2]), team: loser}, {$set: {"record": newRecord}})
 
             //calculate the losing teams new win percentage & update it.
             let winPercentage = calcPercentage(result.wins, result.losses)
             winPercentage = parseFloat(winPercentage.toFixed(3))
-            api.updateOne({team: loser}, {$set: {"pct": winPercentage}})
+            api.updateOne({season: Number(data[2].split('-')[2]), team: loser}, {$set: {"pct": winPercentage}})
 
             //calculate losing teams 10-game streak.
             let streak = calcStreak(result.streak, "loser")
-            api.updateOne({team: loser}, {$set: {"streak": streak}})
+            api.updateOne({season: Number(data[2].split('-')[2]), team: loser}, {$set: {"streak": streak}})
         })
 
         let obj = new regSeasonGames({
@@ -141,7 +141,8 @@ var readFile = fs.createReadStream('./Input/input.csv')
             makeUpGame: parseInt(data[5]),
             divisionGame: parseInt(data[6]),
             interleagueGame: parseInt(data[7]),
-            runDiff: data[3] - data[4]
+            runDiff: data[3] - data[4],
+            season: data[2].split('-')[2]
         })
         let array = new Array(obj)
         gameApi.insertMany(array)

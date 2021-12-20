@@ -9,8 +9,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
     await api.countDocuments()
         .then( (res) => documentCount = res)
         .catch(err => console.log(err));
-    if (documentCount > 0){
-        console.log('Database was not seeded, documents already exist')
+    if (documentCount % 30 !== 0 ){
+        console.log('Database was not seeded, make sure you are not inserting duplicate Teams for a given season')
         return process.exit();
     }else{
         let array = [];
@@ -24,7 +24,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
         }))
         array.push(new franchiseSchema({
             team: "Atlanta Braves",
@@ -36,7 +37,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
         }))
         array.push(new franchiseSchema({
             team: "Baltimore Orioles",
@@ -48,7 +50,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -61,7 +64,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -74,7 +78,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -87,7 +92,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -100,11 +106,12 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
-            team: "Cleveland Indians",
+            team: "Cleveland Guardians",
             teamId: array.length,
             league: 0,
             division: "Central",
@@ -113,7 +120,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -126,7 +134,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -139,7 +148,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
         
         }))
         array.push(new franchiseSchema({
@@ -152,7 +162,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -165,7 +176,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -178,7 +190,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -191,7 +204,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -204,7 +218,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -217,7 +232,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -230,7 +246,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -243,7 +260,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -256,7 +274,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
         }))
         array.push(new franchiseSchema({
             team: "Oakland Athletics",
@@ -268,7 +287,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
         }))
         array.push(new franchiseSchema({
             team: "Philadelphia Phillies",
@@ -280,7 +300,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -293,7 +314,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -306,7 +328,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -319,7 +342,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -332,7 +356,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -345,7 +370,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -358,7 +384,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -371,7 +398,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -384,7 +412,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         array.push(new franchiseSchema({
@@ -397,7 +426,8 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, async (err, 
             record: "0-0",
             streak: "W0",
             gamesBack: 0.0,
-            pct: .000
+            pct: .000, 
+            season: 2022
             
         }))
         api.insertMany(array)

@@ -108,21 +108,22 @@ var readFile = fs.createReadStream('./Input/input.csv')
     MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true}, (err, res)=> {
         
         if (err) throw err;
-        var api = res.db('MLB').collection('franchises2022')
-        var gameApi = res.db('MLB').collection('regularSeasonGames2022')
-        api.findOne( {team: victor}, (err, result) => {
+        var api = res.db('MLB').collection('franchises')
+        var gameApi = res.db('MLB').collection('regularSeasonGames')
+        api.findOne( {season: Number(data[2].split('-')[2]), team: victor}, (err, result) => {
             if (err) throw err;
             try {
                 let data = result
                 calcRecord(data.record, "winner")
             } catch (e){
                 if(e instanceof TypeError){
+                    console.log('error line 120')
                     process.exit(1)
                 }
             }
 
         })
-        api.findOne( {team: loser}, (err, result) => {
+        api.findOne( {season: Number(data[2].split('-')[2]), team: loser}, (err, result) => {
             if (err) throw err;
             try {
                 let data = result
@@ -130,6 +131,7 @@ var readFile = fs.createReadStream('./Input/input.csv')
                 console.log(victor, 'defeated', loser)
             } catch (loser){
                 if(e instanceof TypeError){
+                    console.log('error line 134')
                     process.exit(1)
                 }
             }
@@ -149,9 +151,11 @@ var readFile = fs.createReadStream('./Input/input.csv')
             makeUpGame: parseInt(data[5]),
             divisionGame: parseInt(data[6]),
             interleagueGame: parseInt(data[7]),
-            runDiff: data[3] - data[4]
+            runDiff: data[3] - data[4],
+            season: data[2].split('-')[2]
         })
         console.log('what to insert: ',obj)
+        console.log(data[2].split('-')[2])
         readFile.resume()
     })
     
