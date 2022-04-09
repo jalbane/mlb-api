@@ -3,7 +3,7 @@ const app = express()
 const port = 80
 const MongoClient = require('mongodb').MongoClient
 const cors = require('cors')
-require('dotenv').config()
+//require('dotenv').config()
 var dbConnect
 
 app.use(cors())
@@ -169,62 +169,30 @@ app.get('/regular-season', (req, res) => {
 })
 
 async function getPageNumbers(req, res, next) {
-    if (req.query.hasOwnProperty('number')) {
+    if (req.query.hasOwnProperty('number') && req.query.hasOwnProperty('season')) {
+        console.log(req.query.season, 'from apges')
         let maxPageNumbers = dbConnect.collection('regularSeasonGames')
         await maxPageNumbers
-            .countDocuments()
+            .countDocuments({season: Number(req.query.season)})
             .then(response => (res.locals.pages = Math.floor(response / 20)))
         next()
     } else return res.sendStatus(400)
 }
 
-async function getSeason(req, res, next) {
-    if (req.query.hasOwnProperty('season')) {
-        console.log(req.query.season)
-        let pages = res.locals.pages
-        const season1 = Date.parse(req.query.season)
-        const season2 = Date.parse(req.query.season + 1)
-        dbConnect
-            .collection('regularSeasonGames')
-            .find({
-                $and: [
-                    {
-                        date: { $lt: new Date(season2) },
-                        date: { $gte: new Date(season1) }
-                    }
-                ]
-            })
-            .skip(req.query.number * 20)
-            .limit(20)
-            .sort({ date: -1 })
-            .toArray((err, result) => {
-                if (err) {
-                    return res.send({error: err})
-                }
-                if (result.length === 0) {
-                    return res.status(400).send({result: result})
-                }
-                const pages = Math.floor(result.length / 20)
-                return res.json({ result, pages })
-            })
-    } else next()
-}
-
-app.get('/regular-season/page', getPageNumbers, getSeason, (req, res) => {
-    console.log('asdfasdf111111111111')
+app.get('/regular-season/page', getPageNumbers, (req, res) => {
     let pages = res.locals.pages
     dbConnect
         .collection('regularSeasonGames')
-        .find()
+        .find({season: Number(req.query.season)})
         .skip(req.query.number * 20)
         .limit(20)
         .sort({ date: -1 })
         .toArray((err, result) => {
             if (err) {
-                return res.status(400).send(err)
+                return res.sendStatus(400)
             }
             if (result.length === 0) {
-                return res.status(400).send(err)
+                return res.sendStatus(400)
             }
             return res.json({ result, pages })
         })
