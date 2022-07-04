@@ -3,7 +3,8 @@ const app = express()
 const port = 80
 const MongoClient = require('mongodb').MongoClient
 const cors = require('cors')
-//require('dotenv').config()
+const { ObjectId } = require('mongodb')
+// require('dotenv').config()
 var dbConnect
 
 app.use(cors())
@@ -51,6 +52,7 @@ function getTeamSummary(req, res, next) {
 
 app.get('/franchise/:team', getTeamSummary, (req, res) => {
     var value = parseInt(req.params.team)
+    console.log('asdfasdf')
     // If user searched for a team by entering a teamId ('Number' type in database)
     if (!isNaN(value)) {
         dbConnect.collection('franchises').findOne({ teamId: value }, (err, result) => {
@@ -257,6 +259,28 @@ app.get('/regular-season/wins', (req, res) => {
             }
             return res.json({ db })
         })
+})
+
+app.get('/search-prior-date', (req,res) => {
+    if (!req.query.hasOwnProperty('id')){
+        return res.json({
+            Error: "You're missing one or more required query fields. Check for spelling mistakes"
+        })
+    }
+
+    let gameId = new ObjectId(req.query.id)
+
+    dbConnect
+    .collection('regularSeasonGames')
+    .find( {$and: [{ '_id': {$lt: gameId} }, {season:  {$gte: parseInt(2022)}}, {$or: [{"winner.name": 'New York Yankees'}, {"loser.name": 'New York Yankees'}]} ] } )
+    .toArray((err, db) => {
+        if (err) throw err
+        if (db.length === 0) {
+            return res.json({ error: 'No records found matching your preferences' })
+        }
+        return res.json({ db })
+    })
+
 })
 
 /**
