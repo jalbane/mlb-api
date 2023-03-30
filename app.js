@@ -3,7 +3,6 @@ const app = express()
 const port = 80
 const MongoClient = require('mongodb').MongoClient
 const cors = require('cors')
-const { ObjectId } = require('mongodb')
 // require('dotenv').config()
 var dbConnect
 const ObjectID = require('mongodb').ObjectID
