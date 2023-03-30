@@ -3,6 +3,7 @@ const app = express()
 const port = 80
 const MongoClient = require('mongodb').MongoClient
 const cors = require('cors')
+const { ObjectId } = require('mongodb')
 // require('dotenv').config()
 var dbConnect
 const ObjectID = require('mongodb').ObjectID
@@ -52,6 +53,7 @@ function getTeamSummary(req, res, next) {
 
 app.get('/franchise/:team', getTeamSummary, (req, res) => {
     var value = parseInt(req.params.team)
+    console.log('asdfasdf')
     // If user searched for a team by entering a teamId ('Number' type in database)
     if (!isNaN(value)) {
         dbConnect.collection('franchises').findOne({ teamId: value }, (err, result) => {
