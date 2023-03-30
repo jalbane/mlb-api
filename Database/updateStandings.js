@@ -1,13 +1,12 @@
 const MongoClient = require('mongodb').MongoClient;
 require('dotenv').config();
     
-let date = new Date()
-date = date.getFullYear() + 1
+let date = new Date().getFullYear()
 
 function processLeader(result, api){
     let teamName = result[0].team
     api.updateOne({season: date, team: teamName}, {$set: {"gamesBack": 0}})
-
+    console.log(result[0].team)
     let winDiff, lossDiff, i, gamesBack
     i = 1;
     while (i < result.length){
@@ -24,42 +23,42 @@ MongoClient.connect(process.env.DB_URL, {useUnifiedTopology: true},  async (err,
     var api = res.db('MLB').collection('franchises')
     let arr = []
     let value
-    value = api.find( {season: date, league: 1,division: "East"} ).sort({"pct": -1})
+    value = api.find( {season: date, league: 1,division: "East"} ).sort({"pct": -1, wins: -1})
     while(await value.hasNext()){
         arr.push(await value.next())
     }
     processLeader(arr, api)
     arr = []
 
-    value = api.find( {season: date, league: 1,division: "Central"} ).sort({"pct": -1})
+    value = api.find( {season: date, league: 1,division: "Central"} ).sort({"pct": -1, wins: -1})
     while(await value.hasNext()){
         arr.push(await value.next())
     }
     processLeader(arr, api)
     arr = []
 
-    value = api.find( {season: date, league: 1,division: "West"} ).sort({"pct": -1})
+    value = api.find( {season: date, league: 1,division: "West"} ).sort({"pct": -1, wins: -1})
     while(await value.hasNext()){
         arr.push(await value.next())
     }
     processLeader(arr, api)
     arr = []
     
-    value = api.find( {season: date, league: 0,division: "East"} ).sort({"pct": -1})
+    value = api.find( {season: date, league: 0,division: "East"} ).sort({"pct": -1, wins: -1})
     while(await value.hasNext()){
         arr.push(await value.next())
     }
     processLeader(arr, api)
     arr = []
 
-    value = api.find( {season: date, league: 0,division: "Central"} ).sort({"pct": -1})
+    value = api.find( {season: date, league: 0,division: "Central"} ).sort({"pct": -1, wins: -1})
     while(await value.hasNext()){
         arr.push(await value.next())
     }
     processLeader(arr, api)
     arr = []
 
-    value = api.find( {season: date, league: 0,division: "West"} ).sort({"pct": -1})
+    value = api.find( {season: date, league: 0,division: "West"} ).sort({"pct": -1, wins: -1})
     while(await value.hasNext()){
         arr.push(await value.next())
     }

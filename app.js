@@ -3,8 +3,9 @@ const app = express()
 const port = 80
 const MongoClient = require('mongodb').MongoClient
 const cors = require('cors')
-//require('dotenv').config()
+// require('dotenv').config()
 var dbConnect
+const ObjectID = require('mongodb').ObjectID
 
 app.use(cors())
 app.get('/', (req, res) => {
@@ -250,6 +251,24 @@ app.get('/regular-season/wins', (req, res) => {
     dbConnect
         .collection('regularSeasonGames')
         .find({ 'winner.name': formatTeamString, runDiff: { $gte: parseInt(req.query.margin) } })
+        .toArray((err, db) => {
+            if (err) throw err
+            if (db.length === 0) {
+                return res.json({ error: 'No records found matching your preferences' })
+            }
+            return res.json({ db })
+        })
+})
+
+app.get('/regular-season/gameId', (req, res) => {
+    if (!req.query.hasOwnProperty('game')) {
+        return res.json({
+            Error: "You're missing one or more required query fields. Check for spelling mistakes"
+        })
+    }
+    dbConnect
+        .collection('regularSeasonGames')
+        .find({"_id": new ObjectID(req.query.game)})
         .toArray((err, db) => {
             if (err) throw err
             if (db.length === 0) {
